@@ -1,3 +1,4 @@
+import 'package:awwao/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -51,7 +52,14 @@ class SplashScreen extends StatelessWidget {
                     const SizedBox(height: 40),
                     // Get Started Button
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         minimumSize: const Size(200, 50),
