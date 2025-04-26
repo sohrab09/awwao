@@ -1,3 +1,4 @@
+import 'package:awwao/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,17 +11,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'পাখি ও প্রাণী',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
         fontFamily: 'Hind Siliguri',
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Hello World', style: TextStyle(fontSize: 24)),
-        ),
-      ),
+      home: const SplashScreen(),
     );
   }
 }
