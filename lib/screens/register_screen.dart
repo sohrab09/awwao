@@ -1,24 +1,28 @@
-import 'package:awwao/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -56,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               const Center(
                 child: Text(
-                  'লগইন করুন',
+                  'নতুন অ্যাকাউন্ট তৈরি করুন',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -69,6 +73,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'নাম',
+                        prefixIcon: const Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'নাম প্রয়োজন';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -124,18 +149,43 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          // Implement password recovery
-                        },
-                        child: const Text(
-                          'পাসওয়ার্ড ভুলে গেছেন?',
-                          style: TextStyle(color: Colors.green),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: !_isConfirmPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: 'পাসওয়ার্ড নিশ্চিত করুন',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isConfirmPasswordVisible
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isConfirmPasswordVisible =
+                                  !_isConfirmPasswordVisible;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
                         ),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'পাসওয়ার্ড নিশ্চিত করুন';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'পাসওয়ার্ড মিলছে না';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -144,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Implement login
+                            // Implement registration
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -154,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: const Text(
-                          'লগইন',
+                          'রেজিস্টার',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -219,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return AlertDialog(
                                 title: const Text('Coming Soon!'),
                                 content: const Text(
-                                  'Google login feature is coming soon.',
+                                  'Google register feature is coming soon.',
                                 ),
                                 actions: [
                                   TextButton(
@@ -235,26 +285,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'অ্যাকাউন্ট নেই?',
+                          'ইতিমধ্যে একটি অ্যাকাউন্ট আছে?',
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
+                            Navigator.pop(context);
                           },
                           child: const Text(
-                            'রেজিস্টার করুন',
+                            'লগইন করুন',
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
