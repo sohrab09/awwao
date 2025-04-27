@@ -1,6 +1,6 @@
 import 'package:awwao/screens/category_card.dart';
 import 'package:flutter/material.dart';
-import 'package:awwao/classes/categories.dart';
+import 'package:awwao/classes/subcategories.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
