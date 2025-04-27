@@ -1,3 +1,4 @@
+import 'package:awwao/screens/sub_category_details.dart';
 import 'package:flutter/material.dart';
 import 'package:awwao/classes/categories.dart';
 
@@ -23,6 +24,19 @@ class SubCategoryCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => SubCategoryDetailScreen(
+                    subCategory: subCategory,
+                    categoryType: categoryType,
+                    hasSound: hasSound,
+                  ),
+            ),
+          );
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
