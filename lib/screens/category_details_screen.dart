@@ -1,3 +1,4 @@
+import 'package:awwao/screens/sub_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:awwao/classes/categories.dart';
 
@@ -63,6 +64,23 @@ class CategoryDetailsScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ],
+            ),
+          ),
+
+          // Subcategories List
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: category.subCategories.length,
+              itemBuilder: (context, index) {
+                final subCategory = category.subCategories[index];
+                return SubCategoryCard(
+                  subCategory: subCategory,
+                  categoryType: category.category,
+                  hasSound: category.hasSound,
+                  index: index,
+                );
+              },
             ),
           ),
         ],
