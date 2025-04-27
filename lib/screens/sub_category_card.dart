@@ -165,6 +165,8 @@ class SubCategoryCard extends StatelessWidget {
         return Colors.teal;
       case 'plant':
         return Colors.green;
+      case 'flower':
+        return Colors.pink;
       default:
         return Colors.purple;
     }

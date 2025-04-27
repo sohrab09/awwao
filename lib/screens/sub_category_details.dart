@@ -329,6 +329,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return 'মাছ';
       case 'plant':
         return 'গাছ';
+      case 'flower':
+        return 'ফুল';
       default:
         return '';
     }
@@ -344,6 +346,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return Colors.teal;
       case 'plant':
         return Colors.green;
+      case 'flower':
+        return Colors.pink;
       default:
         return Colors.purple;
     }
@@ -375,6 +379,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return 'জলজ জীবন';
       case 'plant':
         return 'বৃদ্ধি প্রক্রিয়া';
+      case 'flower':
+        return 'ফুলের গঠন';
       default:
         return 'প্রধান বৈশিষ্ট্য';
     }
@@ -390,6 +396,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return '${subCategory.name} জলের নিচে শ্বাস নিতে ফুলকা ব্যবহার করে। তাদের শরীরের আকার জলে সহজে চলাফেরা করার জন্য স্ট্রিমলাইন করা।';
       case 'plant':
         return '${subCategory.name} গাছের বৃদ্ধি মৌসুম অনুযায়ী পরিবর্তিত হয়। গ্রীষ্মকালে দ্রুত বৃদ্ধি পায় এবং শীতকালে বৃদ্ধি ধীর হয়ে যায়। গাছটি সূর্যালোক থেকে শক্তি সংগ্রহ করে।';
+      case 'flower':
+        return '${subCategory.name} যার গঠন হলো- বৃতি, দল, পুং এবং স্ত্রী অংশ। ফুলের বাইরের অংশ হলো বৃতি, যা সাধারণত সবুজ এবং ফুলের কুঁড়ি অবস্থায় ফুলকে রক্ষা করে।';
       default:
         return 'এই বৈশিষ্ট্য সম্পর্কে বিস্তারিত তথ্য এখানে দেখা যাবে।';
     }
@@ -405,6 +413,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return 'প্রজনন প্রক্রিয়া';
       case 'plant':
         return 'ফলন ক্ষমতা';
+      case 'flower':
+        return 'বংশবৃদ্ধি প্রক্রিয়া';
       default:
         return 'অতিরিক্ত বৈশিষ্ট্য';
     }
@@ -420,6 +430,8 @@ class SubCategoryDetailScreen extends StatelessWidget {
         return '${subCategory.name} প্রজনন মৌসুমে বিশেষ এলাকায় যায় এবং সেখানে ডিম পাড়ে। পুরুষ মাছ সেই ডিমে শুক্রাণু দিয়ে নিষিক্ত করে। এভাবে নতুন মাছের জন্ম হয়।';
       case 'plant':
         return '${subCategory.name} গাছে মৌসুম অনুযায়ী ফল ধরে। ফলের মধ্যে বীজ থাকে যা থেকে নতুন গাছের জন্ম হয়। এই গাছের ফল স্বাস্থ্যকর এবং পুষ্টিকর।';
+      case 'flower':
+        return '${subCategory.name} ফুলের বংশবৃদ্ধি প্রক্রিয়া বিশেষভাবে আকর্ষণীয়। ফুলের পাপড়ি এবং গর্ভাশয় মিলিত হয়ে নতুন বীজ উৎপাদন করে।';
       default:
         return 'এই বৈশিষ্ট্য সম্পর্কে বিস্তারিত তথ্য এখানে দেখা যাবে।';
     }

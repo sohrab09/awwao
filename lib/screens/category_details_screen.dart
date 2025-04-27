@@ -91,13 +91,15 @@ class CategoryDetailsScreen extends StatelessWidget {
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'bird':
-        return Colors.purple;
+        return Colors.blue;
       case 'animal':
         return Colors.orange;
       case 'fish':
         return Colors.teal;
       case 'plant':
         return Colors.green;
+      case 'flower':
+        return Colors.pink;
       default:
         return Colors.purple;
     }

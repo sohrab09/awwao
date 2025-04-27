@@ -136,4 +136,27 @@ List<Categories> categories = [
       ),
     ],
   ),
+  Categories(
+    id: 5,
+    name: "ফুল",
+    category: "flower",
+    icon: Icons.local_florist,
+    hasSound: false,
+    subCategories: [
+      SubCategory(
+        name: "গোলাপ",
+        imageUrl: "https://example.com/rose.jpg",
+        habitat: "বাগান, গ্রাম",
+        foodHabit: "সূর্যের আলো ও পানি",
+        imageUrls: List.empty(growable: true),
+      ),
+      SubCategory(
+        name: "জবা",
+        imageUrl: "https://example.com/jaba.jpg",
+        habitat: "বাগান, গ্রাম",
+        foodHabit: "সূর্যের আলো ও পানি",
+        imageUrls: List.empty(growable: true),
+      ),
+    ],
+  ),
 ];
