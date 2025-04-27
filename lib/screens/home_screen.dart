@@ -2,6 +2,7 @@ import 'package:awwao/screens/category_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awwao/classes/subcategories.dart';
+import 'package:awwao/classes/featured_animal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,50 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isSoundOn = true;
   int? _currentlyPlayingIndex;
   bool _isPlaying = false;
-
-  // Mock data for featured animals
-  final List<Map<String, dynamic>> featuredAnimals = const [
-    {
-      'id': '1',
-      'name': 'দোয়েল',
-      'category': 'পাখি',
-      'image': 'assets/images/doel.jpg',
-      'sound': 'sounds/doel.mp3',
-      'hasSound': true,
-    },
-    {
-      'id': '2',
-      'name': 'বাঘ',
-      'category': 'প্রাণী',
-      'image': 'assets/images/tiger.jpg',
-      'sound': 'sounds/tiger.mp3',
-      'hasSound': true,
-    },
-    {
-      'id': '3',
-      'name': 'ময়না',
-      'category': 'পাখি',
-      'image': 'assets/images/moyna.jpg',
-      'sound': 'sounds/moyna.mp3',
-      'hasSound': true,
-    },
-    {
-      'id': '4',
-      'name': 'হাতি',
-      'category': 'প্রাণী',
-      'image': 'assets/images/elephant.jpg',
-      'sound': 'sounds/elephant.mp3',
-      'hasSound': true,
-    },
-    {
-      'id': '4',
-      'name': 'ঘোড়া',
-      'category': 'প্রাণী',
-      'image': 'assets/images/horse.jpg',
-      'sound': 'sounds/horse.mp3',
-      'hasSound': true,
-    },
-  ];
 
   // Mock data for recently viewed animals
   final List<Map<String, dynamic>> recentlyViewed = [
@@ -335,9 +292,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: featuredAnimals.length,
+            itemCount:
+                featuredAnimals
+                    .animals
+                    .length, // Use the list of animals from FeaturedAnimals
             itemBuilder: (context, index) {
-              final animal = featuredAnimals[index];
+              final animal =
+                  featuredAnimals
+                      .animals[index]; // Get the FeaturedAnimal object
 
               return Container(
                 width: 160,
@@ -361,7 +323,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         top: Radius.circular(12),
                       ),
                       child: Image.asset(
-                        animal['image'],
+                        animal
+                            .image, // Use animal.image instead of animal['image']
                         height: 120,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -388,17 +351,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  animal['name'],
+                                  animal
+                                      .name, // Use animal.name instead of animal['name']
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
                                 ),
                               ),
-                              if (animal['hasSound'])
+                              if (animal
+                                  .hasSound) // Use animal.hasSound instead of animal['hasSound']
                                 GestureDetector(
                                   onTap: () async {
-                                    final soundFileName = '${animal['sound']}';
+                                    final soundFileName =
+                                        animal
+                                            .sound; // Use animal.sound instead of animal['sound']
 
                                     if (_currentlyPlayingIndex == index &&
                                         _isPlaying) {
@@ -437,7 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            animal['category'],
+                            animal
+                                .category, // Use animal.category instead of animal['category']
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 14,
