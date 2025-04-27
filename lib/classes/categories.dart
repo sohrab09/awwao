@@ -26,6 +26,8 @@ class SubCategory {
   final String habitat;
   final String foodHabit;
   final List<String> imageUrls;
+  final String? sound;
+  final String? description;
 
   SubCategory({
     required this.name,
@@ -33,5 +35,7 @@ class SubCategory {
     required this.habitat,
     required this.foodHabit,
     this.imageUrls = const [],
+    this.sound,
+    this.description,
   });
 }
