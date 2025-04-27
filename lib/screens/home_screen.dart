@@ -1,3 +1,4 @@
+import 'package:awwao/screens/category_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awwao/classes/categories.dart';
@@ -246,6 +247,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() {
                     activeCategory = category.id;
                   });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              CategoryDetailsScreen(category: category),
+                    ),
+                  );
                 },
                 child: Container(
                   width: 80,

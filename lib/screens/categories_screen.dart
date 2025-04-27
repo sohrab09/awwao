@@ -1,10 +1,9 @@
+import 'package:awwao/screens/category_card.dart';
 import 'package:flutter/material.dart';
-
-// Import your Categories class
 import 'package:awwao/classes/categories.dart';
 
 class CategoriesScreen extends StatelessWidget {
-  const CategoriesScreen({Key? key}) : super(key: key);
+  const CategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,60 +49,6 @@ class CategoriesScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class CategoryCard extends StatelessWidget {
-  final Categories category;
-
-  const CategoryCard({Key? key, required this.category}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to specific category page when tapped
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${category.name} বিভাগ নির্বাচিত হয়েছে')),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                // ignore: deprecated_member_use
-                color: Colors.blue.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(category.icon, size: 40, color: Colors.green[700]),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              category.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-          ],
         ),
       ),
     );
