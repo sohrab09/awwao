@@ -1,6 +1,8 @@
 import 'package:awwao/screens/category_details_screen.dart';
+import 'package:awwao/screens/sub_category_details.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:awwao/classes/categories.dart';
 import 'package:awwao/classes/subcategories.dart';
 import 'package:awwao/classes/featured_animal.dart';
 
@@ -19,6 +21,35 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isSoundOn = true;
   int? _currentlyPlayingIndex;
   bool _isPlaying = false;
+
+  List<SubCategory> _searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchResults = [];
+  }
+
+  void _searchSubCategories(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+      });
+    } else {
+      setState(() {
+        _searchResults =
+            categories
+                .expand((category) => category.subCategories)
+                .where(
+                  (subCategory) =>
+                      subCategory.name.contains(query) ||
+                      subCategory.habitat.contains(query) ||
+                      subCategory.foodHabit.contains(query),
+                )
+                .toList();
+      });
+    }
+  }
 
   // Mock data for recently viewed animals
   final List<Map<String, dynamic>> recentlyViewed = [
@@ -86,25 +117,88 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Content
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Categories section
-                    _buildCategoriesSection(),
+              child:
+                  _searchController.text.isNotEmpty && _searchResults.isNotEmpty
+                      ? ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final subCategory = _searchResults[index];
 
-                    // Featured animals section
-                    _buildFeaturedAnimalsSection(),
+                          // Find the parent category for this subcategory to get the categoryType
+                          final parentCategory = categories.firstWhere(
+                            (category) =>
+                                category.subCategories.contains(subCategory),
+                            orElse:
+                                () =>
+                                    categories[0], // Fallback to first category if not found
+                          );
 
-                    // Recently viewed section
-                    _buildRecentlyViewedSection(),
+                          // Get the categoryType (bird, animal, fish, etc.)
+                          final categoryType = parentCategory.category;
+                          final hasSound = parentCategory.hasSound;
 
-                    // Did you know section
-                    _buildDidYouKnowSection(),
-                  ],
-                ),
-              ),
+                          return ListTile(
+                            // Add an image for better UX
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                subCategory.imageUrl,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 25,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            title: Text(subCategory.name),
+                            subtitle: Text(subCategory.habitat),
+                            onTap: () {
+                              // Navigate to the SubCategoryDetailScreen with all required parameters
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => SubCategoryDetailScreen(
+                                        subCategory: subCategory,
+                                        categoryType: categoryType,
+                                        hasSound: hasSound,
+                                      ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      )
+                      : SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Categories section
+                            _buildCategoriesSection(),
+
+                            // Featured animals section
+                            _buildFeaturedAnimalsSection(),
+
+                            // Recently viewed section
+                            _buildRecentlyViewedSection(),
+
+                            // Did you know section
+                            _buildDidYouKnowSection(),
+                          ],
+                        ),
+                      ),
             ),
           ],
         ),
@@ -162,6 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         setState(() {
                           _searchController.clear();
+                          _searchResults = [];
                         });
                       },
                     )
@@ -170,8 +265,17 @@ class _HomeScreenState extends State<HomeScreen> {
             contentPadding: const EdgeInsets.symmetric(vertical: 15),
           ),
           onChanged: (value) {
-            setState(() {});
+            _searchSubCategories(value);
           },
+          // onTap: () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder:
+          //           (context) => SubCategoryDetailScreen(),
+          //     ),
+          //   );
+          // },
         ),
       ),
     );
