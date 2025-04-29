@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -192,9 +193,67 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // Implement registration
+                            final email = _emailController.text.trim();
+                            final password = _passwordController.text.trim();
+
+                            try {
+                              UserCredential userCredential = await FirebaseAuth
+                                  .instance
+                                  .createUserWithEmailAndPassword(
+                                    email: email,
+                                    password: password,
+                                  );
+                              // show a success message or navigate to another screen
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                              Navigator.pop(context);
+
+                              // Registration successful
+                              print(
+                                "User registered: ${userCredential.user!.email}",
+                              );
+                              // You can navigate to another screen or show success message
+                            } on FirebaseAuthException catch (e) {
+                              String errorMessage = '';
+                              if (e.code == 'email-already-in-use') {
+                                errorMessage =
+                                    'এই ইমেইলটি ইতিমধ্যেই ব্যবহৃত হয়েছে';
+                              } else if (e.code == 'weak-password') {
+                                errorMessage = 'পাসওয়ার্ডটি দুর্বল';
+                              } else {
+                                errorMessage =
+                                    'রেজিস্ট্রেশন ব্যর্থ: ${e.message}';
+                              }
+
+                              // Show error dialog
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (_) => AlertDialog(
+                                      title: const Text('ত্রুটি'),
+                                      content: Text(errorMessage),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.pop(context),
+                                          child: const Text('ঠিক আছে'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
