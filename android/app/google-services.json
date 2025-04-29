@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "766772633647",
+    "project_id": "awwao-9c630",
+    "storage_bucket": "awwao-9c630.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766772633647:android:b30ee834958985a574a6da",
+        "android_client_info": {
+          "package_name": "com.example.awwao"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8nkOHkI9FNAx9j5ecXndjsEZ5McZPoQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
