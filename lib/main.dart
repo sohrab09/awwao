@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'পাখি ও প্রাণী',
+      title: 'ইশকুল',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -198,7 +198,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'পাখি ও প্রাণী',
+          'ইশকুল',
           style: TextStyle(
             fontFamily: 'Hind Siliguri',
             fontSize: 24,
