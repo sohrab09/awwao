@@ -1,4 +1,4 @@
-import 'package:awwao/main.dart';
+import 'package:awwao/classes/userparsistence.dart';
 import 'package:awwao/screens/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +19,23 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Check if already logged in
+    _checkLoginStatus();
+  }
+
+  // Check if user is already logged in
+  Future<void> _checkLoginStatus() async {
+    final isLoggedIn = await UserPersistence.isLoggedIn();
+
+    if (isLoggedIn && mounted) {
+      // Navigate to main page if already logged in
+      Navigator.pushReplacementNamed(context, '/main');
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -37,30 +54,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       // Attempt to sign in with Firebase
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      // If we get here, login was successful
-      if (mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'লগইন সফল হয়েছে!',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      // Get the user ID and email
+      final userId = userCredential.user?.uid;
+      final userEmail = userCredential.user?.email;
+
+      if (userId != null) {
+        // Store user data in local storage
+        await UserPersistence.saveUserData(userId, email: userEmail);
+
+        if (mounted) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'লগইন সফল হয়েছে!',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
+          );
 
-        // Navigate to main page
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
+          // Navigate to main page
+          Navigator.pushReplacementNamed(context, '/main');
+        }
       }
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase Auth errors
@@ -177,10 +197,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
               const SizedBox(height: 20),
               Center(
                 child: Container(

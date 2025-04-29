@@ -1,8 +1,11 @@
+import 'package:awwao/classes/userparsistence.dart';
 import 'package:awwao/screens/categories_screen.dart';
 import 'package:awwao/screens/home_screen.dart';
 import 'package:awwao/screens/login_screen.dart';
 import 'package:awwao/screens/register_screen.dart';
 import 'package:awwao/screens/splash_screen.dart';
+import 'package:awwao/screens/store_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +30,10 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Hind Siliguri',
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const MainPage(),
+      // Start with SplashScreen instead of MainPage
+      home: const SplashScreen(),
       routes: {
-        '/splash': (context) => const SplashScreen(),
+        '/main': (context) => const MainPage(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
       },
@@ -46,13 +50,54 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  String _userName = 'ব্যবহারকারী';
+  String _userEmail = 'example@email.com';
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  // Load user data from shared preferences
+  Future<void> _loadUserData() async {
+    final isLoggedIn = await UserPersistence.isLoggedIn();
+    final email = await UserPersistence.getUserEmail();
+    final name = await UserPersistence.getUserName();
+
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = isLoggedIn;
+        if (email != null) _userEmail = email;
+        if (name != null) _userName = name;
+      });
+    }
+  }
+
+  // Handle logout
+  Future<void> _logout() async {
+    // Sign out from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    // Clear stored user data
+    await UserPersistence.clearUserData();
+
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = false;
+      });
+
+      // Navigate to login screen
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
 
   // Define your bottom tab screens
   final List<Widget> _screens = [
     const HomeScreen(),
     const CategoriesScreen(),
-    const SavedScreen(),
-    const SettingsScreen(),
+    const StoreScreen(),
   ];
 
   // Bottom tab labels & icons
@@ -60,7 +105,6 @@ class _MainPageState extends State<MainPage> {
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'হোম'),
     BottomNavigationBarItem(icon: Icon(Icons.category), label: 'বিভাগ'),
     BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'সংরক্ষিত'),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'সেটিংস'),
   ];
 
   Widget _buildDrawer() {
@@ -68,13 +112,10 @@ class _MainPageState extends State<MainPage> {
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text(
-              'আপনার নাম',
-              style: TextStyle(fontSize: 18),
-            ),
-            accountEmail: const Text(
-              'email@example.com',
-              style: TextStyle(fontSize: 14),
+            accountName: Text(_userName, style: const TextStyle(fontSize: 18)),
+            accountEmail: Text(
+              _userEmail,
+              style: const TextStyle(fontSize: 14),
             ),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
@@ -103,71 +144,43 @@ class _MainPageState extends State<MainPage> {
                     });
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.category),
-                  title: const Text('বিভাগ'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CategoriesScreen(),
-                      ),
-                    );
-
-                    setState(() {
-                      _currentIndex = 1;
-                    });
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bookmark),
-                  title: const Text('সংরক্ষিত'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CategoriesScreen(),
-                      ),
-                    );
-                    setState(() {
-                      _currentIndex = 2;
-                    });
-                  },
-                ),
                 const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.login),
-                  title: const Text('লগইন'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/login');
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.app_registration),
-                  title: const Text('রেজিস্ট্রেশন'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/register');
-                  },
-                ),
+                // Show Login/Register only if not logged in
+                if (!_isLoggedIn) ...[
+                  ListTile(
+                    leading: const Icon(Icons.login),
+                    title: const Text('লগইন'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/login');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.app_registration),
+                    title: const Text('রেজিস্ট্রেশন'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/register');
+                    },
+                  ),
+                ],
               ],
             ),
           ),
           const Divider(),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('লগআউট'),
-              onTap: () {
-                Navigator.pop(context);
-                // Logout Logic
-              },
+          // Show logout only if logged in
+          if (_isLoggedIn)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('লগআউট'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+              ),
             ),
-          ),
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
@@ -204,10 +217,10 @@ class _MainPageState extends State<MainPage> {
               size: 35,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
+              // If not logged in, navigate to login
+              if (!_isLoggedIn) {
+                Navigator.pushNamed(context, '/login');
+              }
             },
           ),
         ],
@@ -226,35 +239,6 @@ class _MainPageState extends State<MainPage> {
           });
         },
       ),
-    );
-  }
-}
-
-// Dummy Screens for Demo Purpose
-
-class SavedScreen extends StatelessWidget {
-  const SavedScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('এটা হলো সংরক্ষিত স্ক্রীন'));
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('এটা হলো সেটিংস  স্ক্রীন'));
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('প্রোফাইল')),
-      body: const Center(child: Text('এটা হলো প্রোফাইল স্ক্রীন')),
     );
   }
 }
