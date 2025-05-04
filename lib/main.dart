@@ -1,4 +1,4 @@
-import 'package:awwao/classes/userparsistence.dart';
+import 'package:awwao/classes/user_persistence.dart';
 import 'package:awwao/screens/categories_screen.dart';
 import 'package:awwao/screens/home_screen.dart';
 import 'package:awwao/screens/login_screen.dart';

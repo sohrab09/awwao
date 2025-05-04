@@ -1,4 +1,4 @@
-import 'package:awwao/classes/userparsistence.dart';
+import 'package:awwao/classes/user_persistence.dart';
 import 'package:awwao/screens/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
