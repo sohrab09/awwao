@@ -33,7 +33,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _currentPage = 0;
 
   // Selected category for animation
-  int _hoveredCategoryIndex = -1;
+  int _hoveredSubcategoryIndex = -1;
+  int _selectedMainCategoryIndex = 0;
 
   final Color _primaryColor = const Color(0xFF4CAF50);
   final Color _accentColor = const Color(0xFFFFEB3B);
@@ -141,9 +142,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               false, // Don't apply safe area at bottom since we'll handle it manually
           child: Stack(
             children: [
-              // Sky background with moving clouds
-              _buildAnimatedBackground(),
-
               // Main content
               CustomScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -154,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   // Featured carousel
                   SliverToBoxAdapter(child: _buildFeaturedCarousel()),
 
-                  // Category header
+                  // Main Categories header
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
@@ -197,10 +195,66 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
 
-                  // Categories grid
+                  // Main Categories row
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 110,
+                      child: _buildMainCategoriesRow(),
+                    ),
+                  ),
+
+                  // Subcategories header
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: mainCategories[_selectedMainCategoryIndex]
+                                  .color
+                                  .withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              mainCategories[_selectedMainCategoryIndex].title,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Container(
+                              height: 2,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    mainCategories[_selectedMainCategoryIndex]
+                                        .color,
+                                    mainCategories[_selectedMainCategoryIndex]
+                                        .color
+                                        .withOpacity(0.1),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Subcategories grid
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
-                    sliver: _buildCategoriesGrid(),
+                    sliver: _buildSubcategoriesGrid(),
                   ),
 
                   // Bottom spacing to accommodate navigation bar
@@ -212,80 +266,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAnimatedBackground() {
-    return AnimatedBuilder(
-      animation: _cloudAnimationController,
-      builder: (context, child) {
-        return Stack(
-          children: [
-            // Blue sky gradient behind clouds
-            Container(
-              height: 200,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF90CAF9), // Light blue
-                    Color(0x0090CAF9), // Fade to transparent
-                  ],
-                ),
-              ),
-            ),
-
-            // Cloud 1
-            Positioned(
-              top: 30,
-              left:
-                  -60 +
-                  (MediaQuery.of(context).size.width + 120) *
-                      _cloudAnimationController.value,
-              child: _buildCloud(80, 50),
-            ),
-
-            // Cloud 2
-            Positioned(
-              top: 90,
-              left:
-                  -80 +
-                  (MediaQuery.of(context).size.width + 160) *
-                      ((_cloudAnimationController.value + 0.3) % 1.0),
-              child: _buildCloud(100, 60),
-            ),
-
-            // Cloud 3
-            Positioned(
-              top: 10,
-              left:
-                  -40 +
-                  (MediaQuery.of(context).size.width + 80) *
-                      ((_cloudAnimationController.value + 0.6) % 1.0),
-              child: _buildCloud(60, 40),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildCloud(double width, double height) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(height / 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
     );
   }
@@ -450,6 +430,91 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildMainCategoriesRow() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      scrollDirection: Axis.horizontal,
+      itemCount: mainCategories.length,
+      itemBuilder: (context, index) {
+        final category = mainCategories[index];
+        final isSelected = _selectedMainCategoryIndex == index;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedMainCategoryIndex = index;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            margin: const EdgeInsets.only(right: 16),
+            width: 90,
+            decoration: BoxDecoration(
+              color: isSelected ? category.color : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: category.color.withOpacity(isSelected ? 0.4 : 0.2),
+                  blurRadius: isSelected ? 8 : 4,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected
+                            ? Colors.white.withOpacity(0.3)
+                            : category.color.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    category.icon,
+                    fit: BoxFit.cover,
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  category.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: isSelected ? Colors.white : category.color,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  SliverGrid _buildSubcategoriesGrid() {
+    final selectedMainCategory = mainCategories[_selectedMainCategoryIndex];
+    final subcategories = selectedMainCategory.subCategories;
+
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
+      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final subcategory = subcategories[index];
+        return _buildSubcategoryItem(subcategory, index);
+      }, childCount: subcategories.length),
+    );
+  }
+
   Widget _buildFeaturedCard(FeaturedItem item, bool isActive) {
     return AnimatedScale(
       scale: isActive ? 1.0 : 0.9,
@@ -579,45 +644,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  SliverGrid _buildCategoriesGrid() {
-    return SliverGrid(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 12.0,
-        mainAxisSpacing: 12.0,
-      ),
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final category = learningCategories[index];
-        return _buildCategoryItem(category, index);
-      }, childCount: learningCategories.length),
-    );
-  }
-
-  Widget _buildCategoryItem(LearningCategory category, int index) {
-    final isHovered = _hoveredCategoryIndex == index;
+  Widget _buildSubcategoryItem(SubCategory subcategory, int index) {
+    final isHovered = _hoveredSubcategoryIndex == index;
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, category.route);
+        Navigator.pushNamed(context, subcategory.route);
       },
       onTapDown: (_) {
         setState(() {
-          _hoveredCategoryIndex = index;
+          _hoveredSubcategoryIndex = index;
         });
       },
       onTapUp: (_) {
         Future.delayed(const Duration(milliseconds: 200), () {
           if (mounted) {
             setState(() {
-              _hoveredCategoryIndex = -1;
+              _hoveredSubcategoryIndex = -1;
             });
           }
         });
       },
       onTapCancel: () {
         setState(() {
-          _hoveredCategoryIndex = -1;
+          _hoveredSubcategoryIndex = -1;
         });
       },
       child: AnimatedContainer(
@@ -629,43 +679,93 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: category.color.withOpacity(isHovered ? 0.4 : 0.2),
+              color: subcategory.color.withOpacity(isHovered ? 0.4 : 0.2),
               blurRadius: isHovered ? 10 : 5,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            // We'll handle the image part with a placeholder since we don't have the actual images
-            Container(
-              width: 60,
-              height: 60,
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: category.color.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Image.asset(category.icon, fit: BoxFit.cover),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: subcategory.color.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    '${mainCategories[_selectedMainCategoryIndex].position}.${subcategory.position}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: subcategory.color,
+                    ),
+                  ),
+                ),
               ),
             ),
-            Text(
-              category.title,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: category.color,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: subcategory.color.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            subcategory.icon,
+                            fit: BoxFit.cover,
+                            width: 35,
+                            height: 35,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              subcategory.title,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: subcategory.color,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              subcategory.description,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              category.description,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
