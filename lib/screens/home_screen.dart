@@ -387,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         SizedBox(
-          height: 180,
+          height: 200, // Increased from 180 to 200
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (int page) {
@@ -405,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.only(top: 8), // Reduced from 16 to 8
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
@@ -520,7 +520,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       scale: isActive ? 1.0 : 0.9,
       duration: const Duration(milliseconds: 300),
       child: Container(
-        margin: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+        margin: const EdgeInsets.fromLTRB(
+          8,
+          8,
+          8,
+          8,
+        ), // Reduced bottom margin from 12 to 8
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -568,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
               // Content
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20), // Reduced from 24 to 20
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -595,19 +600,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12), // Reduced from 16 to 12
                           Text(
                             item.description,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 22,
+                              fontSize: 20, // Reduced from 22 to 20
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12), // Reduced from 16 to 12
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
+                              horizontal: 12, // Reduced from 16 to 12
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
@@ -627,12 +632,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(
+                        10,
+                      ), // Reduced from 12 to 10
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(item.icon, size: 40, color: Colors.white),
+                      child: Icon(
+                        item.icon,
+                        size: 36,
+                        color: Colors.white,
+                      ), // Reduced from 40 to 36
                     ),
                   ],
                 ),
