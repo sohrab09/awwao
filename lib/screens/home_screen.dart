@@ -1,10 +1,7 @@
-import 'package:awwao/screens/category_details_screen.dart';
-import 'package:awwao/screens/sub_category_details.dart';
+import 'package:awwao/classes/learning_category.dart';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:awwao/classes/categories.dart';
-import 'package:awwao/classes/subcategories.dart';
-import 'package:awwao/classes/featured_animal.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,661 +10,662 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int activeCategory = 1;
-  final TextEditingController _searchController = TextEditingController();
-  final AudioPlayer _audioPlayer = AudioPlayer();
+class FeaturedItem {
+  final String title;
+  final String description;
+  final Color color;
+  final IconData icon;
 
-  bool isSoundOn = true;
-  int? _currentlyPlayingIndex;
-  bool _isPlaying = false;
+  FeaturedItem({
+    required this.title,
+    required this.description,
+    required this.color,
+    required this.icon,
+  });
+}
 
-  List<SubCategory> _searchResults = [];
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _backgroundAnimationController;
+  late AnimationController _characterAnimationController;
+  late AnimationController _cloudAnimationController;
+  late AnimationController _carouselController;
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  // Selected category for animation
+  int _hoveredCategoryIndex = -1;
+
+  final Color _primaryColor = const Color(0xFF4CAF50);
+  final Color _accentColor = const Color(0xFFFFEB3B);
+
+  // List of featured items
+  final List _featuredItems = [
+    FeaturedItem(
+      title: 'পাখি',
+      description: 'পাখি সম্পর্কে জানুন',
+      color: const Color(0xFFFFC107), // Amber
+      icon: FontAwesomeIcons.dove,
+    ),
+    FeaturedItem(
+      title: 'প্রাণী',
+      description: 'প্রাণী সম্পর্কে জানুন',
+      color: const Color(0xFF7C4DFF), // Deep Purple Accent
+      icon: Icons.pets,
+    ),
+    FeaturedItem(
+      title: 'গাছ',
+      description: 'গাছ সম্পর্কে জানুন',
+      color: const Color(0xFF4CAF50), // Green
+      icon: Icons.grass,
+    ),
+    FeaturedItem(
+      title: 'মাছ',
+      description: 'মাছ সম্পর্কে জানুন',
+      color: const Color(0xFF00BCD4), // Cyan
+      icon: FontAwesomeIcons.fish,
+    ),
+    FeaturedItem(
+      title: 'ফুল',
+      description: 'ফুল সম্পর্কে জানুন',
+      color: const Color(0xFFFF69B4), // Hot Pink
+      icon: Icons.local_florist,
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _searchResults = [];
-  }
 
-  void _searchSubCategories(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-      });
-    } else {
-      setState(() {
-        _searchResults =
-            categories
-                .expand((category) => category.subCategories)
-                .where(
-                  (subCategory) =>
-                      subCategory.name.contains(query) ||
-                      subCategory.habitat.contains(query) ||
-                      subCategory.foodHabit.contains(query),
-                )
-                .toList();
-      });
-    }
-  }
+    // Set system UI overlay style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
 
-  // Mock data for recently viewed animals
-  final List<Map<String, dynamic>> recentlyViewed = [
-    {
-      'id': '1',
-      'name': 'ঈগল',
-      'category': 'পাখি',
-      'image': 'assets/images/eagle.jpg',
-    },
-    {
-      'id': '2',
-      'name': 'সিংহ',
-      'category': 'প্রাণী',
-      'image': 'assets/images/lion.jpg',
-    },
-    {
-      'id': '3',
-      'name': 'কাক',
-      'category': 'পাখি',
-      'image': 'assets/images/crow.jpg',
-    },
-    {
-      'id': '4',
-      'name': 'গরু',
-      'category': 'প্রাণী',
-      'image': 'assets/images/cow.jpg',
-    },
-    {
-      'id': '5',
-      'name': 'ঘোড়া',
-      'category': 'প্রাণী',
-      'image': 'assets/images/horse.jpg',
-    },
-    {
-      'id': '6',
-      'name': 'টিয়া',
-      'category': 'পাখি',
-      'image': 'assets/images/parrot.jpg',
-    },
-    {
-      'id': '7',
-      'name': 'শিয়াল',
-      'category': 'প্রাণী',
-      'image': 'assets/images/fox.jpg',
-    },
-  ];
+    _backgroundAnimationController = AnimationController(
+      duration: const Duration(seconds: 20),
+      vsync: this,
+    )..repeat();
+
+    _characterAnimationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _cloudAnimationController = AnimationController(
+      duration: const Duration(seconds: 15),
+      vsync: this,
+    )..repeat();
+
+    _carouselController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _pageController = PageController(viewportFraction: 0.85, initialPage: 0);
+  }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _backgroundAnimationController.dispose();
+    _characterAnimationController.dispose();
+    _cloudAnimationController.dispose();
+    _carouselController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get the bottom padding to account for system navigation bar
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            _buildHeader(),
-
-            // Search bar
-            _buildSearchBar(),
-
-            // Content
-            Expanded(
-              child:
-                  _searchController.text.isNotEmpty && _searchResults.isNotEmpty
-                      ? ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final subCategory = _searchResults[index];
-
-                          // Find the parent category for this subcategory to get the categoryType
-                          final parentCategory = categories.firstWhere(
-                            (category) =>
-                                category.subCategories.contains(subCategory),
-                            orElse:
-                                () =>
-                                    categories[0], // Fallback to first category if not found
-                          );
-
-                          // Get the categoryType (bird, animal, fish, etc.)
-                          final categoryType = parentCategory.category;
-                          final hasSound = parentCategory.hasSound;
-
-                          return ListTile(
-                            // Add an image for better UX
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                subCategory.imageUrl,
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 50,
-                                    height: 50,
-                                    color: Colors.grey.shade200,
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      size: 25,
-                                      color: Colors.grey.shade400,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            title: Text(subCategory.name),
-                            subtitle: Text(subCategory.habitat),
-                            onTap: () {
-                              // Navigate to the SubCategoryDetailScreen with all required parameters
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => SubCategoryDetailScreen(
-                                        subCategory: subCategory,
-                                        categoryType: categoryType,
-                                        hasSound: hasSound,
-                                      ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      )
-                      : SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Categories section
-                            _buildCategoriesSection(),
-
-                            // Featured animals section
-                            _buildFeaturedAnimalsSection(),
-
-                            // Recently viewed section
-                            _buildRecentlyViewedSection(),
-
-                            // Did you know section
-                            _buildDidYouKnowSection(),
-                          ],
-                        ),
-                      ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'স্বাগতম!',
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'পাখি ও প্রাণীর সম্পর্কে জানতে আগ্রহী হওয়াতে আপনাকে ধন্যবাদ!',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        height: 50,
+      body: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: 'অনুসন্ধান করুন...',
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
-            suffixIcon:
-                _searchController.text.isNotEmpty
-                    ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
-                      onPressed: () {
-                        setState(() {
-                          _searchController.clear();
-                          _searchResults = [];
-                        });
-                      },
-                    )
-                    : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15),
-          ),
-          onChanged: (value) {
-            _searchSubCategories(value);
-          },
-          // onTap: () {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder:
-          //           (context) => SubCategoryDetailScreen(),
-          //     ),
-          //   );
-          // },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoriesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'বিভাগ সমূহ',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              final isActive = category.id == activeCategory;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    activeCategory = category.id;
-                  });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              CategoryDetailsScreen(category: category),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: isActive ? Colors.green : Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Icon(
-                          category.icon,
-                          color: isActive ? Colors.white : Colors.green,
-                          size: 30,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        category.name,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight:
-                              isActive ? FontWeight.bold : FontWeight.normal,
-                          color: isActive ? Colors.green : Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeaturedAnimalsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 16.0,
-            right: 16.0,
-            top: 24.0,
-            bottom: 12.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'বিশেষ প্রাণী',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('সব প্রাণী দেখানো হবে।')),
-                  );
-                },
-                child: const Text(
-                  'সব দেখুন',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(
+                0xFF81C784,
+              ).withOpacity(0.8), // Light green with transparency
+              _primaryColor, // Base green
             ],
           ),
         ),
-        SizedBox(
-          height: 210,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount:
-                featuredAnimals
-                    .animals
-                    .length, // Use the list of animals from FeaturedAnimals
-            itemBuilder: (context, index) {
-              final animal =
-                  featuredAnimals
-                      .animals[index]; // Get the FeaturedAnimal object
+        child: SafeArea(
+          bottom:
+              false, // Don't apply safe area at bottom since we'll handle it manually
+          child: Stack(
+            children: [
+              // Sky background with moving clouds
+              _buildAnimatedBackground(),
 
-              return Container(
-                width: 160,
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      child: Image.asset(
-                        animal
-                            .image, // Use animal.image instead of animal['image']
-                        height: 120,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 120,
-                            width: double.infinity,
-                            color: Colors.grey.shade200,
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 50,
-                              color: Colors.grey.shade400,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              // Main content
+              CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  // App Bar with animated character
+                  _buildAnimatedAppBar(),
+
+                  // Featured carousel
+                  SliverToBoxAdapter(child: _buildFeaturedCarousel()),
+
+                  // Category header
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  animal
-                                      .name, // Use animal.name instead of animal['name']
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _accentColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'আমরা শিখবো',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Container(
+                              height: 2,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    _accentColor,
+                                    _accentColor.withOpacity(0.1),
+                                  ],
                                 ),
                               ),
-                              if (animal
-                                  .hasSound) // Use animal.hasSound instead of animal['hasSound']
-                                GestureDetector(
-                                  onTap: () async {
-                                    final soundFileName =
-                                        animal
-                                            .sound; // Use animal.sound instead of animal['sound']
-
-                                    if (_currentlyPlayingIndex == index &&
-                                        _isPlaying) {
-                                      // Pause the sound
-                                      await _audioPlayer.pause();
-                                      setState(() {
-                                        _isPlaying = false;
-                                      });
-                                    } else {
-                                      try {
-                                        await _audioPlayer
-                                            .stop(); // Stop previous if any
-                                        await _audioPlayer.play(
-                                          AssetSource(soundFileName),
-                                        );
-                                        setState(() {
-                                          _currentlyPlayingIndex = index;
-                                          _isPlaying = true;
-                                        });
-                                      } catch (e) {
-                                        print('Sound play error: $e');
-                                      }
-                                    }
-                                  },
-                                  child: Icon(
-                                    Icons.volume_up,
-                                    size: 20,
-                                    color:
-                                        (_currentlyPlayingIndex == index &&
-                                                _isPlaying)
-                                            ? Colors.red
-                                            : Colors.green,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            animal
-                                .category, // Use animal.category instead of animal['category']
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
+                  ),
+
+                  // Categories grid
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: _buildCategoriesGrid(),
+                  ),
+
+                  // Bottom spacing to accommodate navigation bar
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: 80 + bottomPadding),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildRecentlyViewedSection() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24.0, bottom: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'সম্প্রতি দেখা',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildAnimatedBackground() {
+    return AnimatedBuilder(
+      animation: _cloudAnimationController,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            // Blue sky gradient behind clouds
+            Container(
+              height: 200,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF90CAF9), // Light blue
+                    Color(0x0090CAF9), // Fade to transparent
+                  ],
                 ),
-                GestureDetector(
-                  onTap: () {
-                    // Navigate to history screen
-                  },
-                  child: const Text(
-                    'সব দেখুন',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.85,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: recentlyViewed.length,
-            itemBuilder: (context, index) {
-              final animal = recentlyViewed[index];
 
-              return GestureDetector(
-                onTap: () {
-                  // Navigate to animal details screen
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade200,
-                        blurRadius: 3,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Placeholder for animal image
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: Container(
-                            width: double.infinity,
-                            color: Colors.grey.shade200,
-                            child: Image.asset(
-                              animal['image'],
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 120,
-                                  width: double.infinity,
-                                  color: Colors.grey.shade200,
-                                  child: Icon(
-                                    Icons.broken_image,
-                                    size: 50,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          animal['name'],
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            // Cloud 1
+            Positioned(
+              top: 30,
+              left:
+                  -60 +
+                  (MediaQuery.of(context).size.width + 120) *
+                      _cloudAnimationController.value,
+              child: _buildCloud(80, 50),
+            ),
+
+            // Cloud 2
+            Positioned(
+              top: 90,
+              left:
+                  -80 +
+                  (MediaQuery.of(context).size.width + 160) *
+                      ((_cloudAnimationController.value + 0.3) % 1.0),
+              child: _buildCloud(100, 60),
+            ),
+
+            // Cloud 3
+            Positioned(
+              top: 10,
+              left:
+                  -40 +
+                  (MediaQuery.of(context).size.width + 80) *
+                      ((_cloudAnimationController.value + 0.6) % 1.0),
+              child: _buildCloud(60, 40),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCloud(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(height / 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDidYouKnowSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.green.shade50,
-          borderRadius: BorderRadius.circular(12),
+  Widget _buildAnimatedAppBar() {
+    return SliverAppBar(
+      expandedHeight: 120,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      pinned: false,
+      floating: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Row(
+            children: [
+              // App logo and name
+              Row(
+                children: [
+                  Hero(
+                    tag: 'app_logo',
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.school,
+                        size: 32,
+                        color: Color(0xFF388E3C),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'ইশকুল',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              blurRadius: 4.0,
+                              offset: Offset(1, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'জ্ঞানের রাজ্যে তোমাকে স্বাগতম',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black26,
+                                blurRadius: 2.0,
+                                offset: Offset(0.5, 0.5),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.lightbulb, color: Colors.amber.shade600),
-                const SizedBox(width: 8),
-                const Text(
-                  'আপনি কি জানেন?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedCarousel() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Text(
+            'আজকের বিশেষ',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 2.0,
+                  offset: Offset(1, 1),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            const Text(
-              'বাংলাদেশে প্রায় ৬৫০ প্রজাতির পাখি দেখা যায়, যার মধ্যে ২৮০ প্রজাতি স্থানীয় এবং বাকিরা অতিথি পাখি।',
-              style: TextStyle(fontSize: 14, height: 1.5),
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPage = page;
+              });
+            },
+            itemCount: _featuredItems.length,
+            itemBuilder: (context, index) {
+              return _buildFeaturedCard(
+                _featuredItems[index],
+                _currentPage == index,
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              _featuredItems.length,
+              (index) => AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: _currentPage == index ? 16 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color:
+                      _currentPage == index
+                          ? _accentColor
+                          : Colors.white.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeaturedCard(FeaturedItem item, bool isActive) {
+    return AnimatedScale(
+      scale: isActive ? 1.0 : 0.9,
+      duration: const Duration(milliseconds: 300),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [item.color, item.color.withOpacity(0.8)],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: item.color.withOpacity(0.4),
+              blurRadius: isActive ? 10 : 5,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              // Background decoration
+              Positioned(
+                right: -20,
+                bottom: -20,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: -10,
+                top: -10,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              item.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            item.description,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'দেখি',
+                              style: TextStyle(
+                                color: item.color,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(item.icon, size: 40, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliverGrid _buildCategoriesGrid() {
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 12.0,
+      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final category = learningCategories[index];
+        return _buildCategoryItem(category, index);
+      }, childCount: learningCategories.length),
+    );
+  }
+
+  Widget _buildCategoryItem(LearningCategory category, int index) {
+    final isHovered = _hoveredCategoryIndex == index;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, category.route);
+      },
+      onTapDown: (_) {
+        setState(() {
+          _hoveredCategoryIndex = index;
+        });
+      },
+      onTapUp: (_) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (mounted) {
+            setState(() {
+              _hoveredCategoryIndex = -1;
+            });
+          }
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          _hoveredCategoryIndex = -1;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        transform:
+            isHovered ? (Matrix4.identity()..scale(1.05)) : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: category.color.withOpacity(isHovered ? 0.4 : 0.2),
+              blurRadius: isHovered ? 10 : 5,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // We'll handle the image part with a placeholder since we don't have the actual images
+            Container(
+              width: 60,
+              height: 60,
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: category.color.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Image.asset(category.icon, fit: BoxFit.cover),
+              ),
+            ),
+            Text(
+              category.title,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: category.color,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              category.description,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
