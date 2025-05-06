@@ -1,13 +1,13 @@
-import 'package:awwao/screens/animals_screen.dart';
-import 'package:awwao/screens/arabic_screen.dart';
-import 'package:awwao/screens/bangla_screen.dart';
-import 'package:awwao/screens/birds_screen.dart';
-import 'package:awwao/screens/english_screen.dart';
-import 'package:awwao/screens/fishes_screen.dart';
-import 'package:awwao/screens/flowers_screen.dart';
-import 'package:awwao/screens/fruits_screen.dart';
-import 'package:awwao/screens/math_screen.dart';
-import 'package:awwao/screens/trees_screen.dart';
+import 'package:awwao/othersscreen/animals_screen.dart';
+import 'package:awwao/othersscreen/arabic_screen.dart';
+import 'package:awwao/othersscreen/bangla_screen.dart';
+import 'package:awwao/othersscreen/birds_screen.dart';
+import 'package:awwao/othersscreen/english_screen.dart';
+import 'package:awwao/othersscreen/fishes_screen.dart';
+import 'package:awwao/othersscreen/flowers_screen.dart';
+import 'package:awwao/othersscreen/fruits_screen.dart';
+import 'package:awwao/othersscreen/math_screen.dart';
+import 'package:awwao/othersscreen/trees_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {

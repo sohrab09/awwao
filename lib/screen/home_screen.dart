@@ -120,9 +120,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Get the bottom padding to account for system navigation bar
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -255,11 +252,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: _buildSubcategoriesGrid(),
-                  ),
-
-                  // Bottom spacing to accommodate navigation bar
-                  SliverToBoxAdapter(
-                    child: SizedBox(height: 80 + bottomPadding),
                   ),
                 ],
               ),

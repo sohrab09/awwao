@@ -1,5 +1,5 @@
 import 'package:awwao/classes/user_persistence.dart';
-import 'package:awwao/screens/register_screen.dart';
+import 'package:awwao/screen/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

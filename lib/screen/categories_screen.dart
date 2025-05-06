@@ -71,7 +71,6 @@ class CategoriesScreen extends StatelessWidget {
   }
 }
 
-// Class to keep track of subcategory with its parent information
 class SubCategoryWithParent {
   final SubCategory subCategory;
   final Color parentColor;

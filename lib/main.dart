@@ -1,11 +1,11 @@
 import 'package:awwao/classes/user_persistence.dart';
 import 'package:awwao/routes/app_routes.dart';
-import 'package:awwao/screens/categories_screen.dart';
-import 'package:awwao/screens/home_screen.dart';
-import 'package:awwao/screens/login_screen.dart';
-import 'package:awwao/screens/register_screen.dart';
-import 'package:awwao/screens/splash_screen.dart';
-import 'package:awwao/screens/store_screen.dart';
+import 'package:awwao/screen/categories_screen.dart';
+import 'package:awwao/screen/home_screen.dart';
+import 'package:awwao/screen/login_screen.dart';
+import 'package:awwao/screen/register_screen.dart';
+import 'package:awwao/screen/splash_screen.dart';
+import 'package:awwao/screen/store_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
