@@ -1,4 +1,6 @@
-import 'package:awwao/data/learning_content.dart';
+import 'package:awwao/othersscreen/bangla_number.dart';
+import 'package:awwao/othersscreen/banjonborno_screen.dart';
+import 'package:awwao/othersscreen/shorborno_screen.dart';
 import 'package:flutter/material.dart';
 
 class BanglaScreen extends StatefulWidget {
@@ -74,7 +76,7 @@ class _BanglaScreenState extends State<BanglaScreen> {
                       subtitle: '০ থেকে ১০০',
                       icon: 'assets/icons/bangla-number.png',
                       bgColor: const Color(0xFF4C87AF),
-                      onTap: () => _navigateTo(context, NumberScreen()),
+                      onTap: () => _navigateTo(context, BanglaNumberScreen()),
                     ),
                     _buildCategoryCard(
                       title: 'নামতা',
