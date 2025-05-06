@@ -1,4 +1,9 @@
+import 'package:awwao/othersscreen/bangla_month.dart';
+import 'package:awwao/othersscreen/bangla_namta.dart';
 import 'package:awwao/othersscreen/bangla_number.dart';
+import 'package:awwao/othersscreen/bangla_poem.dart';
+import 'package:awwao/othersscreen/bangla_season.dart';
+import 'package:awwao/othersscreen/bangla_week.dart';
 import 'package:awwao/othersscreen/banjonborno_screen.dart';
 import 'package:awwao/othersscreen/shorborno_screen.dart';
 import 'package:flutter/material.dart';
@@ -82,45 +87,37 @@ class _BanglaScreenState extends State<BanglaScreen> {
                       title: 'নামতা',
                       subtitle: '১ থেকে ১০',
                       icon: 'assets/icons/multiplication.png',
-                      bgColor: const Color(0xFFFF9800),
-                      onTap: () => _navigateTo(context, const NamtaScreen()),
+                      bgColor: const Color(0xFF3F51B5),
+                      onTap:
+                          () => _navigateTo(context, const BanglaNamtaScreen()),
                     ),
                     _buildCategoryCard(
                       title: 'সপ্তাহ',
                       subtitle: 'বাংলা ৭ দিনের নাম',
                       icon: 'assets/icons/weeks.png',
                       bgColor: const Color(0xFF9C27B0),
-                      onTap:
-                          () => _navigateTo(context, const DaysMonthsScreen()),
+                      onTap: () => _navigateTo(context, const BanglaWeek()),
                     ),
                     _buildCategoryCard(
                       title: 'মাস',
                       subtitle: 'বাংলা ১২ মাসের নাম',
                       icon: 'assets/icons/months.png',
                       bgColor: const Color(0xFFEC1D8F),
-                      onTap:
-                          () => _navigateTo(context, const DaysMonthsScreen()),
+                      onTap: () => _navigateTo(context, const BanglaMonth()),
                     ),
                     _buildCategoryCard(
                       title: 'ঋতু',
                       subtitle: '৬ ঋতু',
                       icon: 'assets/icons/seasons.png',
                       bgColor: const Color(0xFF00BCD4),
-                      onTap: () => _navigateTo(context, const SeasonsScreen()),
+                      onTap: () => _navigateTo(context, const BanglaSeason()),
                     ),
                     _buildCategoryCard(
                       title: 'কবিতা',
                       subtitle: '১০টি ছোট কবিতা',
                       icon: 'assets/icons/poem.png',
                       bgColor: const Color(0xFF795548),
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('কবিতা পাতা খোলা হচ্ছে!'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateTo(context, const BanglaPoem()),
                     ),
                   ],
                 ),

@@ -288,13 +288,13 @@ class BanglaLearningData {
 
   // বাংলা সপ্তাহের নাম (Days of the Week)
   static final List<Map<String, String>> weekDays = [
+    {'day': 'শুক্রবার', 'english': 'Friday'},
+    {'day': 'শনিবার', 'english': 'Saturday'},
     {'day': 'রবিবার', 'english': 'Sunday'},
     {'day': 'সোমবার', 'english': 'Monday'},
     {'day': 'মঙ্গলবার', 'english': 'Tuesday'},
     {'day': 'বুধবার', 'english': 'Wednesday'},
     {'day': 'বৃহস্পতিবার', 'english': 'Thursday'},
-    {'day': 'শুক্রবার', 'english': 'Friday'},
-    {'day': 'শনিবার', 'english': 'Saturday'},
   ];
 
   // বাংলা মাসের নাম (Months)
