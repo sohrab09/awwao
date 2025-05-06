@@ -1,4 +1,5 @@
 import 'package:awwao/classes/user_persistence.dart';
+import 'package:awwao/routes/app_routes.dart';
 import 'package:awwao/screens/categories_screen.dart';
 import 'package:awwao/screens/home_screen.dart';
 import 'package:awwao/screens/login_screen.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
       },
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }
