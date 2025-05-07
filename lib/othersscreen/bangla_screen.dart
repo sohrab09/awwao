@@ -114,7 +114,7 @@ class _BanglaScreenState extends State<BanglaScreen> {
                     ),
                     _buildCategoryCard(
                       title: 'কবিতা',
-                      subtitle: '১০টি ছোট কবিতা',
+                      subtitle: 'ছোট কবিতা',
                       icon: 'assets/icons/poem.png',
                       bgColor: const Color(0xFF795548),
                       onTap: () => _navigateTo(context, const BanglaPoem()),
