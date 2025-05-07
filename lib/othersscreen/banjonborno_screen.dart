@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:awwao/data/learning_content.dart';
 
 class BanjonBornoScreen extends StatefulWidget {
-  const BanjonBornoScreen({Key? key}) : super(key: key);
+  const BanjonBornoScreen({super.key});
 
   @override
   State<BanjonBornoScreen> createState() => _BanjonBornoScreenState();

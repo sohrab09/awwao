@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:awwao/data/learning_content.dart';
 
 class ShoroBornoScreen extends StatefulWidget {
-  ShoroBornoScreen({Key? key}) : super(key: key);
+  const ShoroBornoScreen({super.key});
 
   @override
   State<ShoroBornoScreen> createState() => _ShoroBornoScreenState();
