@@ -452,22 +452,30 @@ class _EnglishScreenState extends State<EnglishScreen> {
       if (num == 17) return 'Seventeen';
       if (num == 18) return 'Eighteen';
       if (num == 19) return 'Nineteen';
-      if (num >= 20 && num < 30)
-        return 'Twenty' + (num > 20 ? '-${getNumberInWords(num - 20)}' : '');
-      if (num >= 30 && num < 40)
-        return 'Thirty' + (num > 30 ? '-${getNumberInWords(num - 30)}' : '');
-      if (num >= 40 && num < 50)
-        return 'Forty' + (num > 40 ? '-${getNumberInWords(num - 40)}' : '');
-      if (num >= 50 && num < 60)
-        return 'Fifty' + (num > 50 ? '-${getNumberInWords(num - 50)}' : '');
-      if (num >= 60 && num < 70)
-        return 'Sixty' + (num > 60 ? '-${getNumberInWords(num - 60)}' : '');
-      if (num >= 70 && num < 80)
-        return 'Seventy' + (num > 70 ? '-${getNumberInWords(num - 70)}' : '');
-      if (num >= 80 && num < 90)
-        return 'Eighty' + (num > 80 ? '-${getNumberInWords(num - 80)}' : '');
-      if (num >= 90 && num < 100)
-        return 'Ninety' + (num > 90 ? '-${getNumberInWords(num - 90)}' : '');
+      if (num >= 20 && num < 30) {
+        return 'Twenty${num > 20 ? '-${getNumberInWords(num - 20)}' : ''}';
+      }
+      if (num >= 30 && num < 40) {
+        return 'Thirty${num > 30 ? '-${getNumberInWords(num - 30)}' : ''}';
+      }
+      if (num >= 40 && num < 50) {
+        return 'Forty${num > 40 ? '-${getNumberInWords(num - 40)}' : ''}';
+      }
+      if (num >= 50 && num < 60) {
+        return 'Fifty${num > 50 ? '-${getNumberInWords(num - 50)}' : ''}';
+      }
+      if (num >= 60 && num < 70) {
+        return 'Sixty${num > 60 ? '-${getNumberInWords(num - 60)}' : ''}';
+      }
+      if (num >= 70 && num < 80) {
+        return 'Seventy${num > 70 ? '-${getNumberInWords(num - 70)}' : ''}';
+      }
+      if (num >= 80 && num < 90) {
+        return 'Eighty${num > 80 ? '-${getNumberInWords(num - 80)}' : ''}';
+      }
+      if (num >= 90 && num < 100) {
+        return 'Ninety${num > 90 ? '-${getNumberInWords(num - 90)}' : ''}';
+      }
       if (num == 100) return 'One Hundred';
       return num.toString(); // Fallback
     }
@@ -526,38 +534,6 @@ class _EnglishScreenState extends State<EnglishScreen> {
       ),
     );
   }
-
-  // Card for list items (days, months, poems)
-  // Widget _buildListCard(
-  //   String title,
-  //   String subtitle,
-  //   Color color,
-  //   IconData icon,
-  // ) {
-  //   return Card(
-  //     margin: const EdgeInsets.only(bottom: 8),
-  //     elevation: 1,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-  //     child: ListTile(
-  //       leading: CircleAvatar(
-  //         backgroundColor: color.withOpacity(0.2),
-  //         child: Icon(icon, color: color),
-  //       ),
-  //       title: Text(
-  //         title,
-  //         style: TextStyle(
-  //           fontWeight: FontWeight.bold,
-  //           color: color.withOpacity(0.8),
-  //         ),
-  //       ),
-  //       subtitle: Text(subtitle),
-  //       trailing: Icon(Icons.volume_up, color: color),
-  //       onTap: () {
-  //         // Pronunciation or detail view
-  //       },
-  //     ),
-  //   );
-  // }
 
   // Weeks Screen - Enhanced Design
   Widget _buildWeeksScreen() {
@@ -1381,9 +1357,11 @@ class _PoemDetailScreenState extends State<PoemDetailScreen>
 
 // A simple confetti overlay effect for when poem reading is completed
 class ConfettiOverlay extends StatelessWidget {
+  const ConfettiOverlay({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: double.infinity,
       child: Stack(
