@@ -32,6 +32,7 @@ flutter:
     - assets/images/
     - assets/images/trees/
     - assets/images/flowers/
+    - assets/images/fruits/
     - assets/sounds/
     - assets/icons/
 
