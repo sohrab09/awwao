@@ -17,7 +17,7 @@ class _TasbeehScreenState extends State<TasbeehScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
   int _currentGoal = 33; // Default goal (33 counts is common in tasbeeh)
-  List<int> _availableGoals = [33, 99, 100, 500, 1000];
+  final List<int> _availableGoals = [33, 99, 100, 500, 1000];
 
   // List of background colors to cycle through
   final List<Color> _backgroundColors = [

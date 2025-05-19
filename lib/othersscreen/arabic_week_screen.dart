@@ -389,12 +389,12 @@ class LanguageRow extends StatelessWidget {
   final TextDirection? textDirection;
 
   const LanguageRow({
-    Key? key,
+    super.key,
     required this.label,
     required this.text,
     required this.textStyle,
     this.textDirection,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -440,10 +440,10 @@ class NavigationButton extends StatelessWidget {
   final VoidCallback? onPressed;
 
   const NavigationButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

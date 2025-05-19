@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:math' as math;
 
 class ZikirScreen extends StatelessWidget {
@@ -138,14 +137,14 @@ class ZikirCounterScreen extends StatefulWidget {
   final Color color;
 
   const ZikirCounterScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.arabic,
     required this.bangla,
     required this.meaning,
     required this.count,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   State<ZikirCounterScreen> createState() => _ZikirCounterScreenState();

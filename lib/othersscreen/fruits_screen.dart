@@ -292,7 +292,7 @@ class _FruitDetailScreenState extends State<FruitDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
+                  Image.asset(
                     widget.fruit.primaryImageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
