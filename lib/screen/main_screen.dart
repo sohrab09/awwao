@@ -1,7 +1,7 @@
 import 'package:awwao/classes/user_persistence.dart';
 import 'package:awwao/screen/categories_screen.dart';
+import 'package:awwao/screen/developer_screen.dart';
 import 'package:awwao/screen/home_screen.dart';
-import 'package:awwao/screen/store_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -55,17 +55,12 @@ class _MainPageState extends State<MainPage> {
   }
 
   // Define your bottom tab screens
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const CategoriesScreen(),
-    const StoreScreen(),
-  ];
+  final List<Widget> _screens = [const HomeScreen(), const CategoriesScreen()];
 
   // Bottom tab labels & icons
   final List<BottomNavigationBarItem> _bottomItems = const [
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'হোম'),
     BottomNavigationBarItem(icon: Icon(Icons.category), label: 'বিভাগ'),
-    BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'সংরক্ষিত'),
   ];
 
   Widget _buildDrawer() {
@@ -99,16 +94,18 @@ class _MainPageState extends State<MainPage> {
               padding: EdgeInsets.zero,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.home),
-                  title: const Text('Home'),
+                  leading: const Icon(Icons.code),
+                  title: const Text('নির্মাতা'),
                   onTap: () {
                     Navigator.pop(context);
-                    setState(() {
-                      _currentIndex = 0;
-                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DeveloperScreen(),
+                      ),
+                    );
                   },
                 ),
-                const Divider(),
               ],
             ),
           ),
