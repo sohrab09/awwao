@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       description: 'গাছ সম্পর্কে জানুন',
       color: const Color(0xFF4CAF50), // Green
       icon: Icons.grass,
-      route: '/plants',
+      route: '/trees',
     ),
     FeaturedItem(
       title: 'মাছ',
@@ -396,9 +396,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             },
             itemCount: _featuredItems.length,
             itemBuilder: (context, index) {
-              return _buildFeaturedCard(
-                _featuredItems[index],
-                _currentPage == index,
+              final item = _featuredItems[index];
+              final isActive = _currentPage == index;
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, item.route);
+                },
+                child: _buildFeaturedCard(item, isActive),
               );
             },
           ),
