@@ -15,12 +15,14 @@ class FeaturedItem {
   final String description;
   final Color color;
   final IconData icon;
+  final String route;
 
   FeaturedItem({
     required this.title,
     required this.description,
     required this.color,
     required this.icon,
+    required this.route,
   });
 }
 
@@ -46,30 +48,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       description: 'পাখি সম্পর্কে জানুন',
       color: const Color(0xFFFFC107), // Amber
       icon: FontAwesomeIcons.dove,
+      route: '/birds',
     ),
     FeaturedItem(
       title: 'প্রাণী',
       description: 'প্রাণী সম্পর্কে জানুন',
       color: const Color(0xFF7C4DFF), // Deep Purple Accent
       icon: Icons.pets,
+      route: '/animals',
     ),
     FeaturedItem(
       title: 'গাছ',
       description: 'গাছ সম্পর্কে জানুন',
       color: const Color(0xFF4CAF50), // Green
       icon: Icons.grass,
+      route: '/plants',
     ),
     FeaturedItem(
       title: 'মাছ',
       description: 'মাছ সম্পর্কে জানুন',
       color: const Color(0xFF00BCD4), // Cyan
       icon: FontAwesomeIcons.fish,
+      route: '/fish',
     ),
     FeaturedItem(
       title: 'ফুল',
       description: 'ফুল সম্পর্কে জানুন',
       color: const Color(0xFFFF69B4), // Hot Pink
       icon: Icons.local_florist,
+      route: '/flowers',
     ),
   ];
 
