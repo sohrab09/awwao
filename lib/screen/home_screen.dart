@@ -1,7 +1,7 @@
 import 'package:awwao/classes/learning_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +14,7 @@ class FeaturedItem {
   final String title;
   final String description;
   final Color color;
-  final IconData icon;
+  final String icon;
   final String route;
 
   FeaturedItem({
@@ -47,35 +47,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       title: 'পাখি',
       description: 'পাখি সম্পর্কে জানুন',
       color: const Color(0xFFFFC107), // Amber
-      icon: FontAwesomeIcons.dove,
+      icon: 'assets/icons/bird.png',
       route: '/birds',
     ),
     FeaturedItem(
       title: 'প্রাণী',
       description: 'প্রাণী সম্পর্কে জানুন',
       color: const Color(0xFF7C4DFF), // Deep Purple Accent
-      icon: Icons.pets,
+      icon: 'assets/icons/animal.png',
       route: '/animals',
     ),
     FeaturedItem(
       title: 'গাছ',
       description: 'গাছ সম্পর্কে জানুন',
       color: const Color(0xFF4CAF50), // Green
-      icon: Icons.grass,
+      icon: 'assets/icons/tree.png',
       route: '/trees',
     ),
     FeaturedItem(
       title: 'মাছ',
       description: 'মাছ সম্পর্কে জানুন',
       color: const Color(0xFF00BCD4), // Cyan
-      icon: FontAwesomeIcons.fish,
+      icon: 'assets/icons/fish.png',
       route: '/fish',
     ),
     FeaturedItem(
       title: 'ফুল',
       description: 'ফুল সম্পর্কে জানুন',
       color: const Color(0xFFFF69B4), // Hot Pink
-      icon: Icons.local_florist,
+      icon: 'assets/icons/flower.png',
       route: '/flowers',
     ),
   ];
@@ -643,10 +643,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: Colors.white.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: Image.asset(
                         item.icon,
-                        size: 36,
-                        color: Colors.white,
+                        width: 36,
+                        height: 36,
                       ), // Reduced from 40 to 36
                     ),
                   ],
