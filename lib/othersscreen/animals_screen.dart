@@ -1,7 +1,7 @@
-import 'package:awwao/othersscreen/animal_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awwao/model/animal_model.dart';
+import 'package:awwao/othersscreen/animal_details_screen.dart';
 
 class AnimalsScreen extends StatefulWidget {
   const AnimalsScreen({super.key});
@@ -15,6 +15,9 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
 
   String searchQuery = '';
   String selectedConservationStatus = 'সব';
+  bool _isLoading = true;
+  List<AnimalCategory> _allAnimals = [];
+
   List<String> conservationStatuses = [
     'সব',
     'অতি বিপন্ন',
@@ -23,9 +26,6 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
     'সাধারণ',
     'হুমকির মুখে',
   ];
-
-  bool _isLoading = true;
-  List<AnimalCategory> _allAnimals = [];
 
   @override
   void initState() {
@@ -38,11 +38,7 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
       final snapshot = await _firestore.collection('animals').get();
       final animals =
           snapshot.docs
-              .map((doc) {
-                final data = doc.data() as Map<String, dynamic>?;
-                if (data == null) return null;
-                return AnimalCategory.fromJson(data);
-              })
+              .map((doc) => AnimalCategory.fromJson(doc.data()))
               .whereType<AnimalCategory>()
               .toList();
 
@@ -51,96 +47,83 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error fetching animals: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      print('Error: $e');
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<AnimalCategory> filteredAnimals =
+    final filteredAnimals =
         _allAnimals.where((animal) {
-          bool matchesSearch =
-              animal.nameEn.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              animal.nameBn.toLowerCase().contains(searchQuery.toLowerCase());
-          bool matchesConservationStatus =
+          final matchesSearch =
+              animal.nameBn.contains(searchQuery) ||
+              animal.nameEn.toLowerCase().contains(searchQuery.toLowerCase());
+          final matchesStatus =
               selectedConservationStatus == 'সব' ||
               animal.endangerment == selectedConservationStatus;
-          return matchesSearch && matchesConservationStatus;
+          return matchesSearch && matchesStatus;
         }).toList();
 
     return Scaffold(
+      backgroundColor: Colors.yellow.shade50,
       appBar: AppBar(
+        backgroundColor: Colors.orange.shade400,
         title: const Text(
           'প্রাণী পরিচিতি',
           style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
             color: Colors.white,
           ),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.teal.shade700,
+        elevation: 4,
       ),
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.teal.shade700,
+            color: Colors.orange.shade100,
             child: Column(
               children: [
                 TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value;
-                    });
-                  },
+                  onChanged: (val) => setState(() => searchQuery = val),
                   decoration: InputDecoration(
-                    hintText: 'প্রাণীর নাম খুঁজুন...',
-                    fillColor: Colors.white,
+                    hintText: 'প্রাণীর নাম লিখুন...',
                     filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: const Icon(Icons.search),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.search),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 SizedBox(
-                  height: 50,
-                  child: ListView.builder(
+                  height: 45,
+                  child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: conservationStatuses.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: FilterChip(
-                          selectedColor: Colors.teal.shade300,
-                          backgroundColor: Colors.white,
-                          label: Text(
-                            conservationStatuses[index],
-                            style: TextStyle(
-                              fontWeight:
-                                  selectedConservationStatus ==
-                                          conservationStatuses[index]
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                          selected:
-                              selectedConservationStatus ==
-                              conservationStatuses[index],
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedConservationStatus =
-                                  conservationStatuses[index];
-                            });
-                          },
+                      final status = conservationStatuses[index];
+                      final isSelected = selectedConservationStatus == status;
+                      return ChoiceChip(
+                        selected: isSelected,
+                        label: Text(status),
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? Colors.white : Colors.black87,
                         ),
+                        selectedColor: Colors.deepOrange,
+                        backgroundColor: Colors.white,
+                        onSelected:
+                            (_) => setState(() {
+                              selectedConservationStatus = status;
+                            }),
                       );
                     },
                   ),
@@ -155,23 +138,26 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
                     : filteredAnimals.isEmpty
                     ? const Center(
                       child: Text(
-                        'কোন প্রাণী পাওয়া যায়নি!',
-                        style: TextStyle(fontSize: 18),
+                        'কোনো প্রাণী পাওয়া যায়নি!',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     )
                     : GridView.builder(
                       padding: const EdgeInsets.all(16),
+                      itemCount: filteredAnimals.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.72,
                           ),
-                      itemCount: filteredAnimals.length,
                       itemBuilder: (context, index) {
                         final animal = filteredAnimals[index];
-                        return _buildAnimalCard(context, animal);
+                        return _buildAnimalCard(animal);
                       },
                     ),
           ),
@@ -180,95 +166,82 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
     );
   }
 
-  Widget _buildAnimalCard(BuildContext context, AnimalCategory animal) {
+  Widget _buildAnimalCard(AnimalCategory animal) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => AnimalDetailScreen(animal: animal),
-          ),
+          MaterialPageRoute(builder: (_) => AnimalDetailScreen(animal: animal)),
         );
       },
-      child: Card(
-        color: Colors.white,
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.shade100,
+              blurRadius: 6,
+              offset: const Offset(3, 3),
+            ),
+          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(10),
+                top: Radius.circular(18),
               ),
               child:
                   animal.mainImage.isNotEmpty
                       ? Image.network(
                         animal.mainImage,
-                        height: 140,
-                        fit: BoxFit.cover,
+                        height: 120,
                         width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder:
+                            (_, child, progress) =>
+                                progress == null
+                                    ? child
+                                    : const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                         errorBuilder:
-                            (context, error, stackTrace) => const Center(
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
+                            (_, __, ___) => const Center(
+                              child: Icon(Icons.broken_image, size: 50),
                             ),
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value:
-                                  loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                              color: Colors.teal,
-                            ),
-                          );
-                        },
                       )
                       : const Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 50,
-                          color: Colors.grey,
-                        ),
+                        child: Icon(Icons.image_not_supported, size: 60),
                       ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      animal.nameEn,
+                      animal.nameBn,
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.deepOrange,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      animal.nameBn,
+                      animal.nameEn,
                       style: TextStyle(
                         fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey.shade700,
+                        color: Colors.grey.shade600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
                     Container(
+                      margin: const EdgeInsets.only(top: 6),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
@@ -276,17 +249,17 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
                       decoration: BoxDecoration(
                         color: _getConservationStatusColor(
                           animal.endangerment,
-                        ).withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(20),
+                        ).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
                         animal.endangerment,
                         style: TextStyle(
                           fontSize: 12,
+                          fontWeight: FontWeight.bold,
                           color: _getConservationStatusColor(
                             animal.endangerment,
                           ),
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -303,17 +276,17 @@ class _AnimalsScreenState extends State<AnimalsScreen> {
   Color _getConservationStatusColor(String status) {
     switch (status) {
       case 'অতি বিপন্ন':
-        return Colors.orange.shade700;
+        return Colors.red.shade800;
       case 'সংরক্ষিত':
-        return Colors.yellow.shade800;
+        return Colors.orange;
       case 'আংশিক বিপন্ন':
-        return Colors.red.shade700;
+        return Colors.purple;
       case 'সাধারণ':
-        return Colors.green.shade700;
+        return Colors.green;
       case 'হুমকির মুখে':
-        return Colors.red.shade900;
+        return Colors.redAccent;
       default:
-        return Colors.blueGrey;
+        return Colors.grey;
     }
   }
 }
